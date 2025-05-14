@@ -28,7 +28,7 @@ class MyChatWidget extends StatefulWidget {
     required this.user,
     required this.receiver,
     required this.widget,
-    this.isHideWidget = false,
+    this.isHideWidget = true,
   });
 
   @override
@@ -53,68 +53,72 @@ class _MyChatWidgetState extends State<MyChatWidget> {
           controller: screenshotController,
           child: widget.widget,
         ),
-        Visibility(
-          visible: widget.isHideWidget ?? false,
-          child: SpeedDial(
-            icon: Icons.shortcut_outlined,
-            overlayOpacity: 0,
-            tooltip: 'Chat',
-            children: [
-              SpeedDialChild(
-                child: const Icon(Icons.screenshot_monitor_outlined),
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                label: 'screenshot ',
-                onTap: () => {
-                  screenshotController.capture().then(
-                    (Uint8List? image) async {
-                      if (image == null) return;
-                      XFile xFile = await convertUint8ListToXFile(image);
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: Visibility(
+            visible: widget.isHideWidget ?? true,
+            child: SpeedDial(
+              icon: Icons.shortcut_outlined,
+              overlayOpacity: 0,
+              tooltip: 'Chat',
+              children: [
+                SpeedDialChild(
+                  child: const Icon(Icons.screenshot_monitor_outlined),
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  label: 'screenshot ',
+                  onTap: () => {
+                    screenshotController.capture().then(
+                      (Uint8List? image) async {
+                        if (image == null) return;
+                        XFile xFile = await convertUint8ListToXFile(image);
 
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatPage(
-                            xFile: xFile,
-                            user: widget.user,
-                            receiver: widget.receiver,
-                            onSendMessage: widget.onSendMessage,
-                            onSendImage: widget.onSendImage,
-                            onSendFile: widget.onSendFile,
-                            getMessageStrem: widget.getMessageStrem,
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatPage(
+                              xFile: xFile,
+                              user: widget.user,
+                              receiver: widget.receiver,
+                              onSendMessage: widget.onSendMessage,
+                              onSendImage: widget.onSendImage,
+                              onSendFile: widget.onSendFile,
+                              getMessageStrem: widget.getMessageStrem,
+                            ),
                           ),
+                        );
+                      },
+                    ).catchError(
+                      (onError) {
+                        print(onError);
+                      },
+                    )
+                  },
+                ),
+                SpeedDialChild(
+                  child: const Icon(Icons.chat_sharp),
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                  label: 'Chat',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatPage(
+                          user: widget.user,
+                          receiver: widget.receiver,
+                          onSendMessage: widget.onSendMessage,
+                          onSendImage: widget.onSendImage,
+                          onSendFile: widget.onSendFile,
+                          getMessageStrem: widget.getMessageStrem,
                         ),
-                      );
-                    },
-                  ).catchError(
-                    (onError) {
-                      print(onError);
-                    },
-                  )
-                },
-              ),
-              SpeedDialChild(
-                child: const Icon(Icons.chat_sharp),
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                label: 'Chat',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatPage(
-                        user: widget.user,
-                        receiver: widget.receiver,
-                        onSendMessage: widget.onSendMessage,
-                        onSendImage: widget.onSendImage,
-                        onSendFile: widget.onSendFile,
-                        getMessageStrem: widget.getMessageStrem,
                       ),
-                    ),
-                  );
-                },
-              ),
-            ],
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ],
