@@ -17,7 +17,7 @@ class MyChatWidget extends StatefulWidget {
   final Future Function(File file, String name) onSendImage;
   final Future Function(File file, PlatformFile platformFile) onSendFile;
   final Stream<List<types.Message>> getMessageStrem;
-  final bool? isHideWidget;
+  final bool? isShowWidget;
 
   const MyChatWidget({
     super.key,
@@ -28,7 +28,7 @@ class MyChatWidget extends StatefulWidget {
     required this.user,
     required this.receiver,
     required this.widget,
-    this.isHideWidget = true,
+    this.isShowWidget = true,
   });
 
   @override
@@ -57,7 +57,7 @@ class _MyChatWidgetState extends State<MyChatWidget> {
           bottom: 16,
           right: 16,
           child: Visibility(
-            visible: widget.isHideWidget ?? true,
+            visible: widget.isShowWidget ?? true,
             child: SpeedDial(
               icon: Icons.shortcut_outlined,
               overlayOpacity: 0,
