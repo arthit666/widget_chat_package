@@ -10,12 +10,15 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 
 class MyChatWidget extends StatefulWidget {
+  final Widget widget;
   final types.User user;
   final types.User receiver;
   final Function(types.Message message) onSendMessage;
   final Future Function(File file, String name) onSendImage;
   final Future Function(File file, PlatformFile platformFile) onSendFile;
   final Stream<List<types.Message>> getMessageStrem;
+  final bool? isHideWidget;
+
   const MyChatWidget({
     super.key,
     required this.onSendMessage,
@@ -24,6 +27,8 @@ class MyChatWidget extends StatefulWidget {
     required this.getMessageStrem,
     required this.user,
     required this.receiver,
+    required this.widget,
+    this.isHideWidget = false,
   });
 
   @override
@@ -42,64 +47,75 @@ class _MyChatWidgetState extends State<MyChatWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return SpeedDial(
-      icon: Icons.shortcut_outlined,
-      overlayOpacity: 0,
-      tooltip: 'Chat',
+    return Stack(
       children: [
-        SpeedDialChild(
-          child: const Icon(Icons.screenshot_monitor_outlined),
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-          label: 'screenshot ',
-          onTap: () => {
-            screenshotController.capture().then(
-              (Uint8List? image) async {
-                if (image == null) return;
-                XFile xFile = await convertUint8ListToXFile(image);
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatPage(
-                      xFile: xFile,
-                      user: widget.user,
-                      receiver: widget.receiver,
-                      onSendMessage: widget.onSendMessage,
-                      onSendImage: widget.onSendImage,
-                      onSendFile: widget.onSendFile,
-                      getMessageStrem: widget.getMessageStrem,
-                    ),
-                  ),
-                );
-              },
-            ).catchError(
-              (onError) {
-                print(onError);
-              },
-            )
-          },
+        Screenshot(
+          controller: screenshotController,
+          child: widget.widget,
         ),
-        SpeedDialChild(
-          child: const Icon(Icons.chat_sharp),
-          backgroundColor: Colors.red,
-          foregroundColor: Colors.white,
-          label: 'Chat',
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatPage(
-                  user: widget.user,
-                  receiver: widget.receiver,
-                  onSendMessage: widget.onSendMessage,
-                  onSendImage: widget.onSendImage,
-                  onSendFile: widget.onSendFile,
-                  getMessageStrem: widget.getMessageStrem,
-                ),
+        Visibility(
+          visible: widget.isHideWidget ?? false,
+          child: SpeedDial(
+            icon: Icons.shortcut_outlined,
+            overlayOpacity: 0,
+            tooltip: 'Chat',
+            children: [
+              SpeedDialChild(
+                child: const Icon(Icons.screenshot_monitor_outlined),
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                label: 'screenshot ',
+                onTap: () => {
+                  screenshotController.capture().then(
+                    (Uint8List? image) async {
+                      if (image == null) return;
+                      XFile xFile = await convertUint8ListToXFile(image);
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatPage(
+                            xFile: xFile,
+                            user: widget.user,
+                            receiver: widget.receiver,
+                            onSendMessage: widget.onSendMessage,
+                            onSendImage: widget.onSendImage,
+                            onSendFile: widget.onSendFile,
+                            getMessageStrem: widget.getMessageStrem,
+                          ),
+                        ),
+                      );
+                    },
+                  ).catchError(
+                    (onError) {
+                      print(onError);
+                    },
+                  )
+                },
               ),
-            );
-          },
+              SpeedDialChild(
+                child: const Icon(Icons.chat_sharp),
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                label: 'Chat',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatPage(
+                        user: widget.user,
+                        receiver: widget.receiver,
+                        onSendMessage: widget.onSendMessage,
+                        onSendImage: widget.onSendImage,
+                        onSendFile: widget.onSendFile,
+                        getMessageStrem: widget.getMessageStrem,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ],
     );
